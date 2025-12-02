@@ -139,7 +139,7 @@ export const FieldCreatePopover = ({
                     <FormLabel>Field type</FormLabel>
                     <FormControl>
                       <FieldTypeSelect
-                        value={field.value}
+                        value={field.value ?? null}
                         onChange={field.onChange}
                         types={types}
                       />
