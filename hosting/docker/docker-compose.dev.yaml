@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    container_name: colanode_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: colanode_user
+      POSTGRES_PASSWORD: postgrespass123
+      POSTGRES_DB: colanode_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    networks:
+      - colanode_network
+
+  valkey:
+    image: valkey/valkey:8.1
+    container_name: colanode_valkey
+    restart: always
+    command: ['valkey-server', '--requirepass', 'your_valkey_password']
+    volumes:
+      - valkey_data:/data
+    ports:
+      - '6379:6379'
+    networks:
+      - colanode_network
+
+  server:
+    # BUILD LOCAL IMAGE WITH YOUR MODIFICATIONS
+    build:
+      context: ../..
+      dockerfile: apps/server/Dockerfile
+    container_name: colanode_server_dev
+    restart: always
+    depends_on:
+      - postgres
+      - valkey
+    environment:
+      NODE_ENV: production
+      SERVER_NAME: 'Colanode Local Dev'
+      SERVER_AVATAR: ''
+      SERVER_MODE: 'standalone'
+
+      # Enable debug logging to see mention events
+      LOGGING_LEVEL: 'debug'
+
+      ACCOUNT_VERIFICATION_TYPE: 'automatic'
+      ACCOUNT_OTP_TIMEOUT: '600'
+
+      USER_STORAGE_LIMIT: '10737418240'
+      USER_MAX_FILE_SIZE: '104857600'
+
+      POSTGRES_URL: 'postgres://colanode_user:postgrespass123@postgres:5432/colanode_db'
+      REDIS_URL: 'redis://:your_valkey_password@valkey:6379/0'
+      REDIS_DB: '0'
+
+      STORAGE_TYPE: 'file'
+      STORAGE_FILE_DIRECTORY: '/var/lib/colanode/storage'
+
+      SMTP_ENABLED: 'false'
+
+    ports:
+      - '3000:3000'
+    volumes:
+      - server_storage:/var/lib/colanode/storage
+    networks:
+      - colanode_network
+
+  web:
+    build:
+      context: ../..
+      dockerfile: apps/web/Dockerfile
+    container_name: colanode_web_dev
+    restart: always
+    ports:
+      - '4000:80'
+    networks:
+      - colanode_network
+
+volumes:
+  postgres_data:
+  valkey_data:
+  server_storage:
+
+networks:
+  colanode_network:
+    driver: bridge
