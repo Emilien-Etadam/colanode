@@ -474,7 +474,9 @@ export const createNodeFromMutation = async (
     // Publish mention events for notifications
     if (model.extractMentions) {
       const mentions = model.extractMentions(mutation.nodeId, attributes);
+      logger.info(`[MENTION DEBUG] Extracted ${mentions.length} mentions from node ${mutation.nodeId}`);
       for (const mention of mentions) {
+        logger.info(`[MENTION DEBUG] Publishing mention event for user ${mention.target}`);
         eventBus.publish({
           type: 'node.mention.created',
           nodeId: mutation.nodeId,
