@@ -359,6 +359,16 @@ export type TempFileDeletedEvent = {
   tempFile: TempFile;
 };
 
+export type WorkspaceMentionReceivedEvent = {
+  type: 'workspace.mention.received';
+  accountId: string;
+  workspaceId: string;
+  nodeId: string;
+  mentionedUserId: string;
+  mentionId: string;
+  rootId: string;
+};
+
 export type Event =
   | UserCreatedEvent
   | UserUpdatedEvent
@@ -412,4 +422,5 @@ export type Event =
   | AvatarCreatedEvent
   | AvatarDeletedEvent
   | TempFileCreatedEvent
-  | TempFileDeletedEvent;
+  | TempFileDeletedEvent
+  | WorkspaceMentionReceivedEvent;

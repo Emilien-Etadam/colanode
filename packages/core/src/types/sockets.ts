@@ -57,11 +57,22 @@ export type UserUpdatedMessage = {
   userId: string;
 };
 
+export type NodeMentionCreatedMessage = {
+  type: 'node.mention.created';
+  accountId: string;
+  workspaceId: string;
+  nodeId: string;
+  mentionedUserId: string;
+  mentionId: string;
+  rootId: string;
+};
+
 export type Message =
   | AccountUpdatedMessage
   | WorkspaceUpdatedMessage
   | WorkspaceDeletedMessage
   | UserCreatedMessage
   | UserUpdatedMessage
+  | NodeMentionCreatedMessage
   | SynchronizerInputMessage
   | SynchronizerOutputMessage<SynchronizerInput>;

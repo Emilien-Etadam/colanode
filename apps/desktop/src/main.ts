@@ -22,7 +22,11 @@ import {
   generateId,
   IdType,
 } from '@colanode/core';
-import { app, appBadge } from '@colanode/desktop/main/app-service';
+import {
+  app,
+  appBadge,
+  appNotifications,
+} from '@colanode/desktop/main/app-service';
 import { handleLocalRequest } from '@colanode/desktop/main/protocols';
 
 const debug = createDebugger('desktop:main');
@@ -189,6 +193,7 @@ electronApp.on('activate', () => {
 ipcMain.handle('init', async () => {
   await app.init();
   appBadge.init();
+  appNotifications.init();
 });
 
 ipcMain.handle(

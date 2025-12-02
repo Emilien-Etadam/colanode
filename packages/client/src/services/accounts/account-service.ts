@@ -234,6 +234,17 @@ export class AccountService {
       message.type === 'user.updated'
     ) {
       this.app.jobs.triggerJobSchedule(this.accountSyncJobScheduleId);
+    } else if (message.type === 'node.mention.created') {
+      // Publish event for workspace to handle notification
+      eventBus.publish({
+        type: 'workspace.mention.received',
+        accountId: this.account.id,
+        workspaceId: message.workspaceId,
+        nodeId: message.nodeId,
+        mentionedUserId: message.mentionedUserId,
+        mentionId: message.mentionId,
+        rootId: message.rootId,
+      });
     }
   }
 

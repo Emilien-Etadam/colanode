@@ -12,6 +12,26 @@ export const extractBlocksMentions = (
   return collectBlockMentions(nodeId, blocks);
 };
 
+const mentionEquals = (a: Mention, b: Mention) =>
+  a.id === b.id && a.target === b.target;
+
+export const checkMentionChanges = (
+  beforeMentions: Mention[],
+  afterMentions: Mention[]
+): { addedMentions: Mention[]; removedMentions: Mention[] } => {
+  const addedMentions = afterMentions.filter(
+    (after) => !beforeMentions.some((before) => mentionEquals(before, after))
+  );
+  const removedMentions = beforeMentions.filter(
+    (before) => !afterMentions.some((after) => mentionEquals(before, after))
+  );
+
+  return {
+    addedMentions,
+    removedMentions,
+  };
+};
+
 const collectBlockMentions = (
   blockId: string,
   blocks: Record<string, Block>

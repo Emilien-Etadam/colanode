@@ -4,6 +4,7 @@ import {
   CanCreateNodeContext,
   CanDeleteNodeContext,
   CanUpdateAttributesContext,
+  checkMentionChanges,
   CreateNodeMutationData,
   DeleteNodeMutationData,
   extractNodeCollaborators,
@@ -470,6 +471,21 @@ export const createNodeFromMutation = async (
 
     await scheduleNodeEmbedding(createdNode);
 
+    // Publish mention events for notifications
+    if (model.extractMentions) {
+      const mentions = model.extractMentions(mutation.nodeId, attributes);
+      for (const mention of mentions) {
+        eventBus.publish({
+          type: 'node.mention.created',
+          nodeId: mutation.nodeId,
+          mentionedUserId: mention.target,
+          mentionId: mention.id,
+          rootId,
+          workspaceId: user.workspace_id,
+        });
+      }
+    }
+
     return MutationStatus.CREATED;
   } catch (error) {
     logger.error(error, `Failed to create node transaction`);
@@ -634,6 +650,25 @@ const tryUpdateNodeFromMutation = async (
     }
 
     await scheduleNodeEmbedding(updatedNode);
+
+    // Publish mention events for new mentions
+    if (model.extractMentions) {
+      const beforeMentions = model.extractMentions(mutation.nodeId, node.attributes);
+      const afterMentions = model.extractMentions(mutation.nodeId, attributes);
+
+      const { addedMentions } = checkMentionChanges(beforeMentions, afterMentions);
+
+      for (const mention of addedMentions) {
+        eventBus.publish({
+          type: 'node.mention.created',
+          nodeId: mutation.nodeId,
+          mentionedUserId: mention.target,
+          mentionId: mention.id,
+          rootId: node.root_id,
+          workspaceId: user.workspace_id,
+        });
+      }
+    }
 
     return { type: 'success', output: MutationStatus.OK };
   } catch {

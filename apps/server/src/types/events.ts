@@ -139,6 +139,15 @@ export type DocumentUpdateCreatedEvent = {
   workspaceId: string;
 };
 
+export type NodeMentionCreatedEvent = {
+  type: 'node.mention.created';
+  nodeId: string;
+  mentionedUserId: string;
+  mentionId: string;
+  rootId: string;
+  workspaceId: string;
+};
+
 export type Event =
   | NodeCreatedEvent
   | NodeUpdatedEvent
@@ -148,6 +157,7 @@ export type Event =
   | NodeInteractionUpdatedEvent
   | NodeReactionCreatedEvent
   | NodeReactionDeletedEvent
+  | NodeMentionCreatedEvent
   | UserCreatedEvent
   | UserUpdatedEvent
   | AccountUpdatedEvent

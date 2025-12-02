@@ -21,6 +21,7 @@ import {
   CollaborationCreatedEvent,
   CollaborationUpdatedEvent,
   Event,
+  NodeMentionCreatedEvent,
   UserCreatedEvent,
   UserUpdatedEvent,
   WorkspaceDeletedEvent,
@@ -104,6 +105,8 @@ export class SocketConnection {
       this.handleCollaborationCreatedEvent(event);
     } else if (event.type === 'collaboration.updated') {
       this.handleCollaborationUpdatedEvent(event);
+    } else if (event.type === 'node.mention.created') {
+      this.handleNodeMentionCreatedEvent(event);
     } else if (event.type === 'user.created') {
       this.handleUserCreatedEvent(event);
     } else if (event.type === 'user.updated') {
@@ -378,6 +381,23 @@ export class SocketConnection {
       type: 'user.updated',
       accountId: event.accountId,
       userId: event.userId,
+    });
+  }
+
+  private handleNodeMentionCreatedEvent(event: NodeMentionCreatedEvent) {
+    const mentionedUser = this.users.get(event.mentionedUserId);
+    if (!mentionedUser) {
+      return; // User is not connected, they'll receive the notification when they sync
+    }
+
+    this.sendMessage({
+      type: 'node.mention.created',
+      accountId: this.context.accountId,
+      workspaceId: event.workspaceId,
+      nodeId: event.nodeId,
+      mentionedUserId: event.mentionedUserId,
+      mentionId: event.mentionId,
+      rootId: event.rootId,
     });
   }
 }
