@@ -473,6 +473,10 @@ export const createNodeFromMutation = async (
 
     // Publish mention events for notifications
     if (model.extractMentions) {
+      logger.info(`[MENTION DEBUG] Attributes type: ${attributes.type}, has content: ${!!attributes.content}`);
+      if (attributes.content) {
+        logger.info(`[MENTION DEBUG] Content keys: ${Object.keys(attributes.content).length}`);
+      }
       const mentions = model.extractMentions(mutation.nodeId, attributes);
       logger.info(`[MENTION DEBUG] Extracted ${mentions.length} mentions from node ${mutation.nodeId}`);
       for (const mention of mentions) {
