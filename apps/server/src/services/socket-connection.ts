@@ -385,11 +385,20 @@ export class SocketConnection {
   }
 
   private handleNodeMentionCreatedEvent(event: NodeMentionCreatedEvent) {
+    this.logger.info(
+      `[MENTION DEBUG] Handling mention event for user ${event.mentionedUserId}, connected users: ${Array.from(this.users.keys()).join(', ')}`
+    );
     const mentionedUser = this.users.get(event.mentionedUserId);
     if (!mentionedUser) {
+      this.logger.info(
+        `[MENTION DEBUG] User ${event.mentionedUserId} not found in this connection`
+      );
       return; // User is not connected, they'll receive the notification when they sync
     }
 
+    this.logger.info(
+      `[MENTION DEBUG] Sending mention notification to user ${event.mentionedUserId}`
+    );
     this.sendMessage({
       type: 'node.mention.created',
       accountId: this.context.accountId,
